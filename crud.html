@@ -260,7 +260,7 @@
             const searchInput = document.getElementById("searchInput").value.trim();
 
             const result = contacts.filter(function (contact){
-                return contact.name.includes(searchInput);
+                return contact.name.toLowerCase().includes(searchInput.toLowerCase());
             });
 
             renderContacts(result);
