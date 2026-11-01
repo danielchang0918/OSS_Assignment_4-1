@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>전화번호부</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background-color: rgb(181, 222, 235);
+            padding: 20px 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: inline-block;
+            width: 70px;
+        }
+
+        form {
+            padding: 20px;
+            border: 1px solid black;
+            border-radius: 10px;
+            background-color: #a6cef5;
+        }
+
+        input,
+        select {
+            margin: 5px;
+            padding: 7px;
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: lightblue;
+            background-color: rgb(236, 234, 234);
+        }
+
+        button {
+            padding: 7px 12px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgb(65, 65, 240);
+            color: white;
+        }
+
+        button:hover {
+            background-color: #2f5fa7;
+        }
+
+        table {
+            text-align: center;
+        }
+
+        th {
+            padding: 10px;
+            background-color: #faf4bb;
+            border: 1px solid black;
+        }
+
+        td {
+            padding: 10px;
+            border: 1px solid black;
+        }
+
+        tbody tr:hover {
+            background-color: rgb(148, 215, 238);
+        }
+
+        th:last-child {
+            background-color: rgb(181, 222, 235);
+            border: none;
+        }
+
+        .button-cell {
+            border: none;
+        }
+
+        td>button:first-child {
+            background-color: #38bd7f;
+        }
+
+        td>button:first-child:hover {
+            background-color: #259963;
+        }
+
+        td>button:last-child {
+            background-color: rgb(223, 119, 119);
+        }
+
+        td>button:last-child:hover {
+            background-color: rgb(192, 89, 89);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>전화번호부</h1>
+
+    <form id="phoneBookForm">
+        <label for="name">이름</label>
+        <input type="text" id="name" required><br>
+
+        <label for="job">직업</label>
+        <input type="text" id="job" required><br>
+
+        <label for="address">주소</label>
+        <input type="text" id="address"><br>
+
+        <label for="pNumber">전화번호</label>
+        <input type="tel" id="pNumber" required><br>
+
+        <label for="gender">성별</label>
+        <select id="gender">
+            <option value="">선택</option>
+            <option value="male">남성</option>
+            <option value="female">여성</option>
+        </select><br>
+
+        <button type="submit">등록</button>
+    </form>
+
+    <hr>
+
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>이름</th>
+                <th>직업</th>
+                <th>주소</th>
+                <th>전화번호</th>
+                <th>성별</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody id="contactList">
+        </tbody>
+    </table>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        let index = 3;
+        let editIndex = -1;
+
+        // 초기 데이터
+        let contacts = [
+            {
+                num: 1,
+                name: "김민수",
+                job: "학생",
+                address: "서울",
+                pNumber: "01012345678",
+                gender: "male"
+            },
+            {
+                num: 2,
+                name: "이서연",
+                job: "회사원",
+                address: "부산",
+                pNumber: "01098765432",
+                gender: "female"
+            },
+            {
+                num: 3,
+                name: "박지훈",
+                job: "교사",
+                address: "대구",
+                pNumber: "01055556666",
+                gender: "male"
+            }
+        ];
+
+        // 수정
+        function editContact(num) {
+            const contact = contacts.find(function (contact) {
+                return contact.num === num;
+            });
+
+            editIndex = contacts.indexOf(contact);
+
+            document.getElementById("name").value = contact.name;
+            document.getElementById("job").value = contact.job;
+            document.getElementById("address").value = contact.address;
+            document.getElementById("pNumber").value = contact.pNumber;
+            document.getElementById("gender").value = contact.gender;
+        }
+
+        // 삭제
+        function deleteContact(num) {
+            const contact = contacts.find(function (contact) {
+                return contact.num === num;
+            });
+
+            if (confirm("정말 삭제하시겠습니까?")) {
+                const index = contacts.indexOf(contact);
+                contacts.splice(index, 1);
+                renderContacts();
+            }
+        }
+
+        // 화면 갱신 함수
+        function renderContacts() {
+            const contactList = document.querySelector("#contactList");
+
+            contactList.innerHTML = "";
+
+            contacts.forEach(function (contact) {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${contact.num}</td>
+                    <td>${contact.name}</td>
+                    <td>${contact.job}</td>
+                    <td>${contact.address}</td>
+                    <td>${contact.pNumber}</td>
+                    <td>${contact.gender === "male" ? "남성" : "여성"}</td>
+                    <td class="button-cell">
+                        <button onclick="editContact(${contact.num})">수정</button>
+                        <button onclick="deleteContact(${contact.num})">삭제</button>
+                    </td>
+                `;
+
+                contactList.appendChild(row);
+            });
+        }
+
+        // Validation 함수
+        function validate(contact) {
+            if (contact.name.length < 2 || contact.name.length > 10) {
+                alert("이름은 2~10글자 사이로 입력해주세요.");
+                document.getElementById("name").focus();
+                return false;
+            }
+
+            if (contact.job.trim() === "") {
+                alert("직업을 입력해주세요.");
+                document.getElementById("job").focus();
+                return false;
+            }
+
+            if (contact.pNumber.trim() === "") {
+                alert("전화번호를 입력해주세요.");
+                document.getElementById("pNumber").focus();
+                return false;
+            }
+
+            if (!/^[0-9]{10,11}$/.test(contact.pNumber)) {
+                alert("전화번호는 숫자 10~11자리로 입력해주세요.");
+                document.getElementById("pNumber").focus();
+                return false;
+            }
+
+            if (contact.gender === "") {
+                alert("성별을 선택해주세요.");
+                document.getElementById("gender").focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // 등록 버튼 클릭 시
+        document.getElementById("phoneBookForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const job = document.getElementById("job").value.trim();
+            const address = document.getElementById("address").value.trim();
+            const pNumber = document.getElementById("pNumber").value.trim();
+            const gender = document.getElementById("gender").value;
+
+            // 연락처 객체 생성
+            const contact = {
+                name: name,
+                job: job,
+                address: address,
+                pNumber: pNumber,
+                gender: gender
+            };
+
+            // Validation 통과 시 등록
+            if (validate(contact)) {
+                if (editIndex === -1) {
+                    // 새 연락처 생성
+                    contact.num = ++index;
+                    contacts.push(contact);
+                } else {
+                    // 기존 연락처 수정
+                    contact.num = contacts[editIndex].num;
+                    contacts[editIndex] = contact;
+                    editIndex = -1;
+                }
+
+                renderContacts();
+                document.querySelector("#phoneBookForm").reset();
+            }
+        });
+
+        // 초기 화면 생성
+        renderContacts();
+    </script>
+</body>
+
+</html>
