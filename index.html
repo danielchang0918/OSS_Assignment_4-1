@@ -117,8 +117,8 @@
         <label for="address">주소</label>
         <input type="text" id="address"><br>
 
-        <label for="pNumber">전화번호</label>
-        <input type="tel" id="pNumber" required><br>
+        <label for="phone">전화번호</label>
+        <input type="tel" id="phone" required><br>
 
         <label for="gender">성별</label>
         <select id="gender">
@@ -156,7 +156,9 @@
         const API_URL = "https://6ae2c65dbbb54129229a6203.mockapi.io/contact"; 
 
         let contacts = [];
+        let editIndex = -1;
 
+        //READ
         async function getContacts(){
             const response = await fetch(API_URL);
 
@@ -165,6 +167,21 @@
             contacts = data; 
             
             renderContacts();
+        }
+
+        //CREATE
+        async function createContact(contact){
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(contact)
+            });
+
+            const data = await response.json();
+
+            await getContacts();
         }
 
         // 수정
@@ -178,7 +195,7 @@
             document.getElementById("name").value = contact.name;
             document.getElementById("job").value = contact.job;
             document.getElementById("address").value = contact.address;
-            document.getElementById("pNumber").value = contact.pNumber;
+            document.getElementById("phone").value = contact.phone;
             document.getElementById("gender").value = contact.gender;
         }
 
@@ -212,8 +229,8 @@
                     <td>${contact.phone}</td>
                     <td>${contact.gender === "male" ? "남성" : "여성"}</td>
                     <td class="button-cell">
-                        <button onclick="editContact(${contact.num})">수정</button>
-                        <button onclick="deleteContact(${contact.num})">삭제</button>
+                        <button onclick="editContact(${contact.id})">수정</button>
+                        <button onclick="deleteContact(${contact.id})">삭제</button>
                     </td>
                 `;
 
@@ -235,15 +252,15 @@
                 return false;
             }
 
-            if (contact.pNumber.trim() === "") {
+            if (contact.phone.trim() === "") {
                 alert("전화번호를 입력해주세요.");
-                document.getElementById("pNumber").focus();
+                document.getElementById("phone").focus();
                 return false;
             }
 
-            if (!/^[0-9]{10,11}$/.test(contact.pNumber)) {
+            if (!/^[0-9]{10,11}$/.test(contact.phone)) {
                 alert("전화번호는 숫자 10~11자리로 입력해주세요.");
-                document.getElementById("pNumber").focus();
+                document.getElementById("phone").focus();
                 return false;
             }
 
@@ -257,13 +274,13 @@
         }
 
         // 등록 버튼 클릭 시
-        document.getElementById("phoneBookForm").addEventListener("submit", function (event) {
+        document.getElementById("phoneBookForm").addEventListener("submit", async function (event) {
             event.preventDefault();
 
             const name = document.getElementById("name").value.trim();
             const job = document.getElementById("job").value.trim();
             const address = document.getElementById("address").value.trim();
-            const pNumber = document.getElementById("pNumber").value.trim();
+            const phone = document.getElementById("phone").value.trim();
             const gender = document.getElementById("gender").value;
 
             // 연락처 객체 생성
@@ -271,16 +288,14 @@
                 name: name,
                 job: job,
                 address: address,
-                pNumber: pNumber,
+                phone: phone,
                 gender: gender
             };
 
             // Validation 통과 시 등록
             if (validate(contact)) {
                 if (editIndex === -1) {
-                    // 새 연락처 생성
-                    contact.num = ++index;
-                    contacts.push(contact);
+                    await createContact(contact);
                 } else {
                     // 기존 연락처 수정
                     contact.num = contacts[editIndex].num;
