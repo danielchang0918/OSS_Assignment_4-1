@@ -236,13 +236,18 @@
                 return;
             }
 
-            const response = await fetch(`${API_URL}/${id}`, {
-                method: "DELETE"
-            });
+            try {
+                const response = await fetch(`${API_URL}/${id}`, {
+                    method: "DELETE"
+                });
 
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-            await getContacts();
+                await getContacts();
+            } catch (error) {
+                alert("연락처를 삭제하는 중 오류가 발생했습니다.");
+            }
+
         }
 
         // 화면 갱신 함수
