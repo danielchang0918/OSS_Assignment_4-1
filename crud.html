@@ -114,7 +114,7 @@
         <input type="text" id="job" required><br>
 
         <label for="address">주소</label>
-        <input type="text" id="address"><br>
+        <input type="text" id="address" required><br>
 
         <label for="phone">전화번호</label>
         <input type="tel" id="phone" required><br>
@@ -283,15 +283,9 @@
                 return false;
             }
 
-            if (contact.job.trim() === "") {
-                alert("직업을 입력해주세요.");
+            if (contact.job.length < 2 || contact.job.length > 20) {
+                alert("직업은 2~30글자 사이로 입력해주세요.");
                 document.getElementById("job").focus();
-                return false;
-            }
-
-            if (contact.phone.trim() === "") {
-                alert("전화번호를 입력해주세요.");
-                document.getElementById("phone").focus();
                 return false;
             }
 
