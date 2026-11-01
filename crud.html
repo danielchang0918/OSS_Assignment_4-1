@@ -130,6 +130,12 @@
     </form>
 
     <hr>
+    
+    <div>
+        <input type="text" id="searchInput" placeholder="이름을 검색하세요">
+        <button type="button" onclick="searchContacts()">검색</button>
+        <button type="button" onclick="resetSearch()">초기화</button>
+    </div>
 
     <table>
         <thead>
@@ -249,13 +255,30 @@
             }
         }
 
+        //검색
+        function searchContacts(){
+            const searchInput = document.getElementById("searchInput").value.trim();
+
+            const result = contacts.filter(function (contact){
+                return contact.name.includes(searchInput);
+            });
+
+            renderContacts(result);
+        }
+
+        //검색 초기화
+        function resetSearch(){
+            document.querySelector("#searchInput").value = "";
+            renderContacts();
+        }
+        
         // 화면 갱신 함수
-        function renderContacts() {
+        function renderContacts(displayContacts = contacts) {
             const contactList = document.querySelector("#contactList");
 
             contactList.innerHTML = "";
 
-            contacts.forEach(function (contact) {
+            displayContacts.forEach(function (contact) {
                 const row = document.createElement("tr");
 
                 row.innerHTML = `
@@ -283,7 +306,7 @@
                 return false;
             }
 
-            if (contact.job.length < 2 || contact.job.length > 20) {
+            if (contact.job.length < 2 || contact.job.length > 30) {
                 alert("직업은 2~30글자 사이로 입력해주세요.");
                 document.getElementById("job").focus();
                 return false;
