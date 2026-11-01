@@ -152,36 +152,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        let index = 3;
-        let editIndex = -1;
+        //mockAPI 주소
+        const API_URL = "https://6ae2c65dbbb54129229a6203.mockapi.io/contact"; 
 
-        // 초기 데이터
-        let contacts = [
-            {
-                num: 1,
-                name: "김민수",
-                job: "학생",
-                address: "서울",
-                pNumber: "01012345678",
-                gender: "male"
-            },
-            {
-                num: 2,
-                name: "이서연",
-                job: "회사원",
-                address: "부산",
-                pNumber: "01098765432",
-                gender: "female"
-            },
-            {
-                num: 3,
-                name: "박지훈",
-                job: "교사",
-                address: "대구",
-                pNumber: "01055556666",
-                gender: "male"
-            }
-        ];
+        let contacts = [];
+
+        async function getContacts(){
+            const response = await fetch(API_URL);
+
+            const data = await response.json();
+
+            contacts = data; 
+            
+            renderContacts();
+        }
 
         // 수정
         function editContact(num) {
@@ -221,11 +205,11 @@
                 const row = document.createElement("tr");
 
                 row.innerHTML = `
-                    <td>${contact.num}</td>
+                    <td>${contact.id}</td>
                     <td>${contact.name}</td>
                     <td>${contact.job}</td>
                     <td>${contact.address}</td>
-                    <td>${contact.pNumber}</td>
+                    <td>${contact.phone}</td>
                     <td>${contact.gender === "male" ? "남성" : "여성"}</td>
                     <td class="button-cell">
                         <button onclick="editContact(${contact.num})">수정</button>
@@ -310,7 +294,7 @@
         });
 
         // 초기 화면 생성
-        renderContacts();
+        getContacts();
     </script>
 </body>
 
