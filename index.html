@@ -155,52 +155,79 @@
         const API_URL = "https://6ae2c65dbbb54129229a6203.mockapi.io/contact";
 
         let contacts = [];
-        let editIndex = -1;
+
+        //CREATE
+        async function createContact(contact) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(contact)
+                });
+
+                if (!response.ok) throw new Error(`HTTPS${response.status}`);
+
+                const data = await response.json();
+
+                await getContacts();
+            } catch (error) {
+                alert("연락처를 불러오는 중 오류가 발생하였습니다.");
+            }
+        }
 
         //READ
         async function getContacts() {
             try {
                 const response = await fetch(API_URL);
-                if(!response.ok) throw new Error(`HTTP${response.status}`);
+                if (!response.ok) throw new Error(`HTTP${response.status}`);
 
                 const data = await response.json();
 
                 contacts = data;
 
                 renderContacts();
-            }catch(error){
+            } catch (error) {
                 alert("연락처를 불러오는 중 오류가 발생하였습니다.");
             }
         }
 
-        //CREATE
-        async function createContact(contact) {
-            const response = await fetch(API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(contact)
-            });
+        // UPDATE
+        let editIndex = null;
 
-            const data = await response.json();
-
-            await getContacts();
-        }
-
-        // 수정
-        function editContact(num) {
+        //선택한 데이터 form에 불러오기
+        function editContact(id) {
             const contact = contacts.find(function (contact) {
-                return contact.num === num;
+                return String(contact.id) === String(id);
             });
 
-            editIndex = contacts.indexOf(contact);
+            editIndex = id;
 
             document.getElementById("name").value = contact.name;
             document.getElementById("job").value = contact.job;
             document.getElementById("address").value = contact.address;
             document.getElementById("phone").value = contact.phone;
             document.getElementById("gender").value = contact.gender;
+        }
+        
+        //수정된 데이터 서버에 전송하기
+        async function updateContact(id, contact){
+            try{
+                const response = await fetch(`${API_URL}/${id}`,{
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(contact)
+                });
+
+                if(!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                await getContacts();
+            }catch(error){
+                alert("연락처를 수정하는 중 오류가 발생했습니다.");
+            }
         }
 
         // 삭제
@@ -244,8 +271,8 @@
 
         // Validation 함수
         function validate(contact) {
-            if (contact.name.length < 2 || contact.name.length > 10) {
-                alert("이름은 2~10글자 사이로 입력해주세요.");
+            if (contact.name.length < 2 || contact.name.length > 20) {
+                alert("이름은 2~20글자 사이로 입력해주세요.");
                 document.getElementById("name").focus();
                 return false;
             }
@@ -258,12 +285,6 @@
 
             if (contact.phone.trim() === "") {
                 alert("전화번호를 입력해주세요.");
-                document.getElementById("phone").focus();
-                return false;
-            }
-
-            if (!/^[0-9]{10,11}$/.test(contact.phone)) {
-                alert("전화번호는 숫자 10~11자리로 입력해주세요.");
                 document.getElementById("phone").focus();
                 return false;
             }
@@ -298,13 +319,12 @@
 
             // Validation 통과 시 등록
             if (validate(contact)) {
-                if (editIndex === -1) {
+                if (editIndex === null) {
                     await createContact(contact);
                 } else {
                     // 기존 연락처 수정
-                    contact.num = contacts[editIndex].num;
-                    contacts[editIndex] = contact;
-                    editIndex = -1;
+                    await updateContact(editIndex, contact);
+                    editId = null;
                 }
 
                 renderContacts();
