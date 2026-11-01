@@ -247,7 +247,6 @@
             } catch (error) {
                 alert("연락처를 삭제하는 중 오류가 발생했습니다.");
             }
-
         }
 
         // 화면 갱신 함수
@@ -331,7 +330,7 @@
                 } else {
                     // 기존 연락처 수정
                     await updateContact(editIndex, contact);
-                    editId = null;
+                    editIndex = null;
                 }
 
                 renderContacts();
