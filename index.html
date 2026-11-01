@@ -121,7 +121,7 @@
 
         <label for="gender">성별</label>
         <select id="gender">
-            <option value="">선택</option>
+            <option value="" selected>선택</option>
             <option value="male">남성</option>
             <option value="female">여성</option>
         </select><br>
@@ -210,11 +210,11 @@
             document.getElementById("phone").value = contact.phone;
             document.getElementById("gender").value = contact.gender;
         }
-        
+
         //수정된 데이터 서버에 전송하기
-        async function updateContact(id, contact){
-            try{
-                const response = await fetch(`${API_URL}/${id}`,{
+        async function updateContact(id, contact) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`, {
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json"
@@ -222,25 +222,27 @@
                     body: JSON.stringify(contact)
                 });
 
-                if(!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
                 await getContacts();
-            }catch(error){
+            } catch (error) {
                 alert("연락처를 수정하는 중 오류가 발생했습니다.");
             }
         }
 
-        // 삭제
-        function deleteContact(num) {
-            const contact = contacts.find(function (contact) {
-                return contact.num === num;
+        // DELETE
+        async function deleteContact(id) {
+            if (!confirm("정말 삭제하시겠습니까?")) {
+                return;
+            }
+
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: "DELETE"
             });
 
-            if (confirm("정말 삭제하시겠습니까?")) {
-                const index = contacts.indexOf(contact);
-                contacts.splice(index, 1);
-                renderContacts();
-            }
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+            await getContacts();
         }
 
         // 화면 갱신 함수
